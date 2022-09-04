@@ -17,27 +17,27 @@ spec:
         version: 2022-09-04-57b5965
     spec:
       containers:
-      - envFrom:
-        - configMapRef:
-            name: shared-configs
-            optional: true
-        - configMapRef:
-            name: product
-            optional: true
-        - configMapRef:
-            name: product-terraform
-            optional: true
-        - configMapRef:
-            name: shared-secrets
-            optional: true
-        - secretRef:
-            name: product
-            optional: true
-        - secretRef:
-            name: product-terraform
-            optional: true
-        image: github.com/anddd7/monorepo/product:57b5965-dirty
-        name: product
-        ports:
-        - containerPort: 8080
-          name: grpc
+        - envFrom:
+            - configMapRef:
+                name: shared-configs
+                optional: true
+            - configMapRef:
+                name: product
+                optional: true
+            - configMapRef:
+                name: product-terraform
+                optional: true
+            - configMapRef:
+                name: shared-secrets
+                optional: true
+            - secretRef:
+                name: product
+                optional: true
+            - secretRef:
+                name: product-terraform
+                optional: true
+          image: github.com/anddd7/monorepo/product:57b5965-dirty
+          name: product
+          ports:
+            - containerPort: 8080
+              name: grpc
