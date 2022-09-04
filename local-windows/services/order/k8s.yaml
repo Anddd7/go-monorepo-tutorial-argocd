@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: order
+    version: 2022-09-04-2f2431b
+  name: order
+  namespace: dev-mac
+spec:
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+        version: 2022-09-04-2f2431b
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: shared-configs
+            optional: true
+        - configMapRef:
+            name: order
+            optional: true
+        - configMapRef:
+            name: order-terraform
+            optional: true
+        - configMapRef:
+            name: shared-secrets
+            optional: true
+        - secretRef:
+            name: order
+            optional: true
+        - secretRef:
+            name: order-terraform
+            optional: true
+        image: github.com/anddd7/monorepo/order:2f2431b-dirty
+        name: order
+        ports:
+        - containerPort: 8080
+          name: grpc
