@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: product
+    version: 2022-09-04-587cc8c
+  name: product
+  namespace: wsl-ubuntu-dev
+spec:
+  selector:
+    matchLabels:
+      app: product
+  template:
+    metadata:
+      labels:
+        app: product
+        version: 2022-09-04-587cc8c
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: shared-configs
+            optional: true
+        - configMapRef:
+            name: product
+            optional: true
+        - configMapRef:
+            name: product-terraform
+            optional: true
+        - configMapRef:
+            name: shared-secrets
+            optional: true
+        - secretRef:
+            name: product
+            optional: true
+        - secretRef:
+            name: product-terraform
+            optional: true
+        image: github.com/anddd7/monorepo/product:587cc8c-dirty
+        name: product
+        ports:
+        - containerPort: 8080
+          name: grpc
