@@ -17,7 +17,7 @@ metadata:
   labels:
     app: order
     date: 2022-09-11
-    version: v-3c3d2d4
+    version: v-e22be6d
   name: order
   namespace: wsl-ubuntu-dev
 spec:
@@ -28,7 +28,7 @@ spec:
     metadata:
       labels:
         app: order
-        version: v-3c3d2d4
+        version: v-e22be6d
     spec:
       containers:
       - env:
@@ -53,7 +53,7 @@ spec:
         - secretRef:
             name: order-terraform
             optional: true
-        image: github.com/anddd7/monorepo/order:3c3d2d4
+        image: github.com/anddd7/monorepo/order:e22be6d
         livenessProbe:
           grpc:
             port: 50051
@@ -83,8 +83,8 @@ spec:
   host: order
   subsets:
   - labels:
-      version: v-3c3d2d4
-    name: v-3c3d2d4
+      version: v-e22be6d
+    name: v-e22be6d
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -103,4 +103,4 @@ spec:
     route:
     - destination:
         host: order
-        subset: v-3c3d2d4
+        subset: v-e22be6d
