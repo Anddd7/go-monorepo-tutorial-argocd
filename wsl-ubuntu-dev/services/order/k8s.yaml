@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: product
+  name: order
   namespace: wsl-ubuntu-dev
 spec:
   ports:
@@ -9,25 +9,25 @@ spec:
     port: 50051
     targetPort: 50051
   selector:
-    app: product
+    app: order
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: product
+    app: order
     date: 2022-09-11
     version: v-a7b8b8d
-  name: product
+  name: order
   namespace: wsl-ubuntu-dev
 spec:
   selector:
     matchLabels:
-      app: product
+      app: order
   template:
     metadata:
       labels:
-        app: product
+        app: order
         version: v-a7b8b8d
     spec:
       containers:
@@ -39,22 +39,22 @@ spec:
             name: shared-configs-terraform
             optional: true
         - configMapRef:
-            name: product
+            name: order
             optional: true
         - configMapRef:
-            name: product-terraform
+            name: order-terraform
             optional: true
         - configMapRef:
             name: shared-secrets-terraform
             optional: true
         - secretRef:
-            name: product
+            name: order
             optional: true
         - secretRef:
-            name: product-terraform
+            name: order-terraform
             optional: true
-        image: github.com/anddd7/monorepo/product:a7b8b8d
-        name: product
+        image: github.com/anddd7/monorepo/order:a7b8b8d
+        name: order
         ports:
         - containerPort: 50051
           name: grpc
@@ -62,10 +62,10 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
-  name: product
+  name: order
   namespace: wsl-ubuntu-dev
 spec:
-  host: product
+  host: order
   subsets:
   - labels:
       version: v-a7b8b8d
@@ -74,7 +74,7 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: product-grpc
+  name: order-grpc
   namespace: wsl-ubuntu-dev
 spec:
   gateways:
@@ -84,8 +84,8 @@ spec:
   http:
   - match:
     - uri:
-        prefix: /product.InternalService
+        prefix: /order.InternalService
     route:
     - destination:
-        host: product
+        host: order
         subset: v-a7b8b8d
