@@ -53,7 +53,7 @@ spec:
         - secretRef:
             name: order-terraform
             optional: true
-        image: github.com/anddd7/monorepo/order:e22be6d
+        image: github.com/anddd7/monorepo/order:e22be6d-dirty
         livenessProbe:
           grpc:
             port: 50051
