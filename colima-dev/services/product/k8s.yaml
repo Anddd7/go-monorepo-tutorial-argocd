@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: product
+  namespace: colima-dev
+spec:
+  ports:
+  - name: grpc-50051
+    port: 50051
+    targetPort: 50051
+  selector:
+    app: product
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: product
+    date: 2022-11-11
+    version: v-a6d3226
+  name: product
+  namespace: colima-dev
+spec:
+  selector:
+    matchLabels:
+      app: product
+  template:
+    metadata:
+      labels:
+        app: product
+        version: v-a6d3226
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "50051"
+        envFrom:
+        - configMapRef:
+            name: shared-configs-terraform
+            optional: true
+        - configMapRef:
+            name: product
+            optional: true
+        - configMapRef:
+            name: product-terraform
+            optional: true
+        - configMapRef:
+            name: shared-secrets-terraform
+            optional: true
+        - secretRef:
+            name: product
+            optional: true
+        - secretRef:
+            name: product-terraform
+            optional: true
+        image: ghcr.io/anddd7/monorepo/product:a6d3226-dirty
+        livenessProbe:
+          grpc:
+            port: 50051
+          initialDelaySeconds: 10
+        name: product
+        ports:
+        - containerPort: 50051
+          name: grpc
+        readinessProbe:
+          grpc:
+            port: 50051
+          initialDelaySeconds: 5
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: product
+  namespace: colima-dev
+spec:
+  host: product
+  subsets:
+  - labels:
+      version: v-a6d3226
+    name: v-a6d3226
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: product-grpc
+  namespace: colima-dev
+spec:
+  gateways:
+  - dynamicloading-gateway
+  hosts:
+  - '*'
+  http:
+  - match:
+    - uri:
+        prefix: /product.InternalService
+    route:
+    - destination:
+        host: product
+        subset: v-a6d3226

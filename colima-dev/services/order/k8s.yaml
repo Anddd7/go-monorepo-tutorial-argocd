@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: order
+  namespace: colima-dev
+spec:
+  ports:
+  - name: grpc-50051
+    port: 50051
+    targetPort: 50051
+  selector:
+    app: order
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: order
+    date: 2022-11-11
+    version: v-a6d3226
+  name: order
+  namespace: colima-dev
+spec:
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+        version: v-a6d3226
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "50051"
+        envFrom:
+        - configMapRef:
+            name: shared-configs-terraform
+            optional: true
+        - configMapRef:
+            name: order
+            optional: true
+        - configMapRef:
+            name: order-terraform
+            optional: true
+        - configMapRef:
+            name: shared-secrets-terraform
+            optional: true
+        - secretRef:
+            name: order
+            optional: true
+        - secretRef:
+            name: order-terraform
+            optional: true
+        image: ghcr.io/anddd7/monorepo/order:a6d3226-dirty
+        livenessProbe:
+          grpc:
+            port: 50051
+          initialDelaySeconds: 10
+        name: order
+        ports:
+        - containerPort: 50051
+          name: grpc
+        readinessProbe:
+          grpc:
+            port: 50051
+          initialDelaySeconds: 5
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: order
+  namespace: colima-dev
+spec:
+  host: order
+  subsets:
+  - labels:
+      version: v-a6d3226
+    name: v-a6d3226
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: order-grpc
+  namespace: colima-dev
+spec:
+  gateways:
+  - dynamicloading-gateway
+  hosts:
+  - '*'
+  http:
+  - match:
+    - uri:
+        prefix: /order.InternalService
+    route:
+    - destination:
+        host: order
+        subset: v-a6d3226
