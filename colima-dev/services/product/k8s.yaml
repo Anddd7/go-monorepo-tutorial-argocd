@@ -17,7 +17,7 @@ metadata:
   labels:
     app: product
     date: 2022-11-11
-    version: v-a6d3226
+    version: v-178d7b1
   name: product
   namespace: colima-dev
 spec:
@@ -28,7 +28,7 @@ spec:
     metadata:
       labels:
         app: product
-        version: v-a6d3226
+        version: v-178d7b1
     spec:
       containers:
       - env:
@@ -53,7 +53,7 @@ spec:
         - secretRef:
             name: product-terraform
             optional: true
-        image: ghcr.io/anddd7/monorepo/product:a6d3226-dirty
+        image: ghcr.io/anddd7/monorepo/product:178d7b1
         livenessProbe:
           grpc:
             port: 50051
@@ -83,8 +83,8 @@ spec:
   host: product
   subsets:
   - labels:
-      version: v-a6d3226
-    name: v-a6d3226
+      version: v-178d7b1
+    name: v-178d7b1
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -103,4 +103,4 @@ spec:
     route:
     - destination:
         host: product
-        subset: v-a6d3226
+        subset: v-178d7b1

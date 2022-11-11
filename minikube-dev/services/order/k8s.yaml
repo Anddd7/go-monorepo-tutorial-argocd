@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: order
-  namespace: wsl-ubuntu-dev
+  namespace: minikube-dev
 spec:
   ports:
   - name: grpc-50051
@@ -16,10 +16,10 @@ kind: Deployment
 metadata:
   labels:
     app: order
-    date: 2022-09-11
-    version: v-e22be6d
+    date: 2022-11-11
+    version: v-178d7b1
   name: order
-  namespace: wsl-ubuntu-dev
+  namespace: minikube-dev
 spec:
   selector:
     matchLabels:
@@ -28,7 +28,7 @@ spec:
     metadata:
       labels:
         app: order
-        version: v-e22be6d
+        version: v-178d7b1
     spec:
       containers:
       - env:
@@ -53,7 +53,7 @@ spec:
         - secretRef:
             name: order-terraform
             optional: true
-        image: github.com/anddd7/monorepo/order:e22be6d-dirty
+        image: ghcr.io/anddd7/monorepo/order:178d7b1
         livenessProbe:
           grpc:
             port: 50051
@@ -78,19 +78,19 @@ apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: order
-  namespace: wsl-ubuntu-dev
+  namespace: minikube-dev
 spec:
   host: order
   subsets:
   - labels:
-      version: v-e22be6d
-    name: v-e22be6d
+      version: v-178d7b1
+    name: v-178d7b1
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: order-grpc
-  namespace: wsl-ubuntu-dev
+  namespace: minikube-dev
 spec:
   gateways:
   - dynamicloading-gateway
@@ -103,4 +103,4 @@ spec:
     route:
     - destination:
         host: order
-        subset: v-e22be6d
+        subset: v-178d7b1
